@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import requests
+from upload_to_s3 import upload_file
 
 BASE_URL = "https://dummyjson.com"
 RAW_DATA_DIR = Path("data/raw")
@@ -18,8 +19,10 @@ def fetch_data(endpoint):
 
 def save_json(data, filename):
     """
-    Save API response as a JSON file in the raw data directory.
+    Save API response as a JSON file in the raw data directory
+    and upload it to Amazon S3.
     """
+
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     file_path = RAW_DATA_DIR / filename
@@ -29,4 +32,5 @@ def save_json(data, filename):
 
     print(f"Saved: {file_path}")
 
-
+    # Upload to S3
+    upload_file(filename)

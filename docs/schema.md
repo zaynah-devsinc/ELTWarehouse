@@ -1,22 +1,20 @@
 # Schema Documentation
 
-## Project
+## Project Overview
 
-E-Commerce ELT Data Warehouse
+This project is an **E-Commerce ELT Data Warehouse** that uses data from the **DummyJSON API**. The objective is to extract product, customer, and shopping cart data, transform it into a structured format, and load it into a data warehouse for analysis and reporting.
 
-## Data Source
+### API Base URL
 
-API: DummyJSON
-
-Base URL:
-
+```text
 https://dummyjson.com
+```
 
-The project currently uses the following endpoints:
+### API Endpoints Used
 
-- GET /products
-- GET /users
-- GET /carts
+* `GET /products`
+* `GET /users`
+* `GET /carts`
 
 ---
 
@@ -24,39 +22,41 @@ The project currently uses the following endpoints:
 
 ## Endpoint
 
-GET /products
+`GET /products`
 
 ## Description
 
-Contains information about products available in the store.
+The Products endpoint provides information about all products available in the online store. Only the fields required for analysis are included in the warehouse.
 
-## Fields Selected for Analysis
+### Fields Used
 
-| Field | Type | Notes |
-|--------|------|-------|
-| id | Integer | Product ID |
-| title | String | Product name |
-| description | String | Product description |
-| category | String | Product category |
-| price | Decimal | Product price |
-| discountPercentage | Decimal | Product discount |
-| rating | Decimal | Customer rating |
-| stock | Integer | Available inventory |
-| brand | String | Product brand |
-| sku | String | Stock Keeping Unit (SKU) |
+| Field              | Type    | Description                 |
+| ------------------ | ------- | --------------------------- |
+| id                 | Integer | Unique product ID           |
+| title              | String  | Product name                |
+| description        | String  | Product description         |
+| category           | String  | Product category            |
+| price              | Decimal | Selling price               |
+| discountPercentage | Decimal | Product discount percentage |
+| rating             | Decimal | Average customer rating     |
+| stock              | Integer | Available inventory         |
+| brand              | String  | Product brand               |
+| sku                | String  | Stock Keeping Unit (SKU)    |
 
-## Fields Ignored
+### Fields Excluded
 
-- images
-- thumbnail
-- reviews
-- dimensions
-- warrantyInformation
-- shippingInformation
-- availabilityStatus
-- tags
-- minimumOrderQuantity
-- meta
+The following fields were available in the API but were not required for this project:
+
+* images
+* thumbnail
+* reviews
+* dimensions
+* warrantyInformation
+* shippingInformation
+* availabilityStatus
+* tags
+* minimumOrderQuantity
+* meta
 
 ---
 
@@ -64,46 +64,48 @@ Contains information about products available in the store.
 
 ## Endpoint
 
-GET /users
+`GET /users`
 
 ## Description
 
-Contains customer information.
+The Users endpoint contains customer information used for customer analysis and reporting. Only basic customer details were selected.
 
-## Fields Selected for Analysis
+### Fields Used
 
-| Field | Type | Notes |
-|--------|------|-------|
-| id | Integer | Customer ID |
-| firstName | String | First name |
-| lastName | String | Last name |
-| email | String | Email address |
-| phone | String | Phone number |
-| age | Integer | Customer age |
-| gender | String | Customer gender |
-| birthDate | Date | Date of birth |
-| address.city | String | Customer city |
-| address.state | String | Customer state |
-| address.country | String | Customer country |
+| Field           | Type    | Description           |
+| --------------- | ------- | --------------------- |
+| id              | Integer | Unique customer ID    |
+| firstName       | String  | Customer's first name |
+| lastName        | String  | Customer's last name  |
+| email           | String  | Email address         |
+| phone           | String  | Contact number        |
+| age             | Integer | Customer age          |
+| gender          | String  | Customer gender       |
+| birthDate       | Date    | Date of birth         |
+| address.city    | String  | Customer city         |
+| address.state   | String  | Customer state        |
+| address.country | String  | Customer country      |
 
-## Fields Ignored
+### Fields Excluded
 
-- password
-- image
-- crypto
-- bank
-- company
-- bloodGroup
-- hair
-- eyeColor
-- height
-- weight
-- ip
-- macAddress
-- university
-- ein
-- ssn
-- userAgent
+The following fields were not needed for the data warehouse:
+
+* password
+* image
+* crypto
+* bank
+* company
+* bloodGroup
+* hair
+* eyeColor
+* height
+* weight
+* ip
+* macAddress
+* university
+* ein
+* ssn
+* userAgent
 
 ---
 
@@ -111,35 +113,49 @@ Contains customer information.
 
 ## Endpoint
 
-GET /carts
+`GET /carts`
 
 ## Description
 
-Contains shopping cart information. Each cart belongs to one user and contains one or more products.
+The Carts endpoint contains shopping cart information. Each cart belongs to a customer and contains one or more products along with quantity and pricing details.
 
-## Cart Fields Selected for Analysis
+### Cart Fields Used
 
-| Field | Type | Notes |
-|--------|------|-------|
-| id | Integer | Cart ID |
-| userId | Integer | Customer ID |
-| total | Decimal | Cart total |
-| discountedTotal | Decimal | Total after discounts |
-| totalProducts | Integer | Number of unique products |
-| totalQuantity | Integer | Total quantity of items |
+| Field           | Type    | Description                       |
+| --------------- | ------- | --------------------------------- |
+| id              | Integer | Cart ID                           |
+| userId          | Integer | Customer ID                       |
+| total           | Decimal | Total cart value before discounts |
+| discountedTotal | Decimal | Total value after discounts       |
+| totalProducts   | Integer | Number of different products      |
+| totalQuantity   | Integer | Total quantity of items           |
 
-## Product Fields Inside Cart
+### Product Fields Used in Each Cart
 
-| Field | Type | Notes |
-|--------|------|-------|
-| id | Integer | Product ID |
-| title | String | Product name |
-| price | Decimal | Product price |
-| quantity | Integer | Quantity purchased |
-| total | Decimal | Total price before discount |
-| discountPercentage | Decimal | Product discount |
-| discountedTotal | Decimal | Total after discount |
+| Field              | Type    | Description                 |
+| ------------------ | ------- | --------------------------- |
+| id                 | Integer | Product ID                  |
+| title              | String  | Product name                |
+| price              | Decimal | Price per item              |
+| quantity           | Integer | Quantity purchased          |
+| total              | Decimal | Total price before discount |
+| discountPercentage | Decimal | Discount percentage         |
+| discountedTotal    | Decimal | Total price after discount  |
 
-## Fields Ignored
+### Fields Excluded
 
-- thumbnail
+The following field was not required for analysis:
+
+* thumbnail
+
+---
+
+## Summary
+
+The data warehouse is built using three main datasets:
+
+* **Products** for product-related information
+* **Users** for customer details
+* **Carts** for purchase and transaction information
+
+Only the fields relevant to reporting and analytics were selected. Unnecessary or sensitive fields were excluded to keep the warehouse simple, efficient, and focused on business analysis.

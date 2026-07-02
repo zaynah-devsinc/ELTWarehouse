@@ -6,6 +6,7 @@ import pandas as pd
 connection = duckdb.connect("database/ecommerce.duckdb")
 
 
+
 def load_json(file_path, key):
     """
     Read a JSON file and return a DataFrame.
