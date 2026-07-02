@@ -1,0 +1,29 @@
+[0m23:30:04  Running with dbt=1.11.12
+[0m23:30:04  Registered adapter: duckdb=1.10.1
+[0m23:30:05  Found 10 models, 21 data tests, 490 macros
+[0m23:30:05  
+[0m23:30:05  Concurrency: 4 threads (target='dev')
+[0m23:30:05  
+[0m23:30:05  Building catalog
+[0m23:30:06  Catalog written to /Users/d-23-9386/Desktop/ELTWarehouse/ecommerce_dbt/target/catalog.json
+[0m23:30:09  Running with dbt=1.11.12
+Serving docs at 8080
+To access from your browser, navigate to: http://localhost:8080
+
+
+
+Press Ctrl+C to exit.
+127.0.0.1 - - [02/Jul/2026 19:30:10] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [02/Jul/2026 19:30:10] "GET /manifest.json?cb=1783035010579 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Jul/2026 19:30:10] "GET /catalog.json?cb=1783035010579 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Jul/2026 19:30:10] code 404, message File not found
+127.0.0.1 - - [02/Jul/2026 19:30:10] "GET /%7B%7B%20getIcon(item.type,%20'on')%20%7D%7D HTTP/1.1" 404 -
+127.0.0.1 - - [02/Jul/2026 19:30:10] code 404, message File not found
+127.0.0.1 - - [02/Jul/2026 19:30:10] "GET /%7B%7B%20getIcon(item.type,%20'off')%20%7D%7D HTTP/1.1" 404 -
+127.0.0.1 - - [02/Jul/2026 19:30:11] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [02/Jul/2026 19:30:11] "GET /manifest.json?cb=1783035011703 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Jul/2026 19:30:11] "GET /catalog.json?cb=1783035011703 HTTP/1.1" 200 -
+127.0.0.1 - - [02/Jul/2026 19:30:11] code 404, message File not found
+127.0.0.1 - - [02/Jul/2026 19:30:11] "GET /%7B%7B%20getIcon(item.type,%20'on')%20%7D%7D HTTP/1.1" 404 -
+127.0.0.1 - - [02/Jul/2026 19:30:11] code 404, message File not found
+127.0.0.1 - - [02/Jul/2026 19:30:11] "GET /%7B%7B%20getIcon(item.type,%20'off')%20%7D%7D HTTP/1.1" 404 -

@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: sales_summary
+    description: "High-level aggregate sales and revenue metrics"
+    columns:
+      - name: total_revenue
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0
+      - name: average_order_value
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0
+
+  - name: customer_summary
+    description: "Aggregated customer metrics including lifetime value and order value metrics"
+    columns:
+      - name: lifetime_value
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0
+      - name: average_order_value
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0
+
+  - name: category_sales
+    description: "Revenue metrics grouped by product category"
+    columns:
+      - name: revenue
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0

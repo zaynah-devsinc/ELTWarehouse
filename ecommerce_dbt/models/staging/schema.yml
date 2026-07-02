@@ -7,7 +7,6 @@ models:
     columns:
       - name: product_id
         description: "Unique identifier for each product"
-
         tests:
           - unique
           - not_null
@@ -17,6 +16,17 @@ models:
           - not_null
 
       - name: price
+        tests:
+          - not_null
+          - is_greater_than:
+              value: 0
+
+      - name: stock
+        tests:
+          - is_greater_than_or_equal_to:
+              value: 0
+
+      - name: category
         tests:
           - not_null
 
@@ -32,6 +42,13 @@ models:
       - name: email
         tests:
           - not_null
+          - is_valid_email
+
+      - name: age
+        tests:
+          - is_between:
+              min_value: 0
+              max_value: 120
 
   - name: stg_carts
     description: "Cleaned shopping carts"
@@ -41,3 +58,14 @@ models:
         tests:
           - unique
           - not_null
+
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('stg_users')
+              field: customer_id
+
+      - name: total
+        tests:
+          - is_greater_than_or_equal_to_column:
+              compare_to_column: discounted_total

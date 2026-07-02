@@ -2,166 +2,168 @@ import streamlit as st
 import duckdb
 import plotly.express as px
 
+# 1. Page Configuration
 st.set_page_config(
     page_title="E-Commerce ELT Dashboard",
     page_icon="🛒",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-#duckdb connection
+# 2. Database Connection & Data Fetching
+@st.cache_resource
+def get_connection():
+    return duckdb.connect("database/ecommerce.duckdb")
 
-conn = duckdb.connect("database/ecommerce.duckdb")
+conn = get_connection()
 
-#loading DUCKDB tables -> pandas Dataframes
+# Fetch dataframes
+sales = conn.sql("SELECT * FROM sales_summary").df()
+category = conn.sql("SELECT * FROM category_sales ORDER BY revenue DESC").df()  # Sorted for better visuals
+customers = conn.sql("SELECT * FROM customer_summary ORDER BY lifetime_value DESC LIMIT 10").df()
+products = conn.sql("SELECT * FROM stg_products ORDER BY product_id").df()
 
-sales = conn.sql("""
-SELECT *
-FROM sales_summary
-""").df()
-
-category = conn.sql("""
-SELECT *
-FROM category_sales
-""").df()
-
-customers = conn.sql("""
-SELECT *
-FROM customer_summary
-ORDER BY lifetime_value DESC
-LIMIT 10
-""").df()
-
-products = conn.sql("""
-SELECT *
-FROM stg_products
-ORDER BY product_id
-""").df()
-
-#random sidebar
-
-st.sidebar.title("Project Overview")
-
-st.sidebar.markdown("""
-### E-Commerce ELT Pipeline
-
+# 3. Sidebar - Clean Architecture Overview
+with st.sidebar:
+    st.image("https://img.icons8.com/clouds/100/000000/analytics.png", width=80)
+    st.title("Data Pipeline")
+    st.caption("Technical Architecture & Source")
+    
+    st.markdown("---")
+    
+    # Modernized pipeline display using status/info widgets
+    st.markdown("### 🏗️ ELT Flow")
+    st.code("""
 DummyJSON API
-
-↓
-
-Python Extraction
-
-↓
-
+     ↓  [Python Extract]
 Amazon S3 (Raw Layer)
-
-↓
-
-DuckDB
-
-↓
-
+     ↓  [DuckDB Ingest]
 dbt Transformations
+     ↓  [Semantic Layer]
+Streamlit UI
+    """, language="text")
+    
+    st.markdown("---")
+    st.info("💡 **Tech Stack:**\nPython, S3, DuckDB, dbt, Streamlit")
 
-↓
+# 4. Header Section
+st.title("🛒 E-Commerce ELT Dashboard")
+st.markdown("Business metrics generated dynamically from the production ELT pipeline.")
+st.markdown("---")
 
-Streamlit Dashboard
-""")
+# 5. Executive KPIs (Top Level Metrics)
+# Wrapped in a container for visual structure
+with st.container():
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            label="Total Revenue",
+            value=f"${sales['total_revenue'][0]:,.2f}",
+            
+        )
+    with col2:
+        st.metric(
+            label="Total Orders",
+            value=f"{int(sales['total_orders'][0]):,}"
+        )
+    with col3:
+        st.metric(
+            label="Average Order Value (AOV)",
+            value=f"${sales['average_order_value'][0]:,.2f}"
+        )
+    with col4:
+        st.metric(
+            label="Total Items Sold",
+            value=f"{int(sales['total_items_sold'][0]):,}"
+        )
 
-#title
-st.title("E-Commerce ELT Dashboard")
+st.markdown("<br>", unsafe_allow_html=True)
 
-st.markdown("Business metrics generated from the ELT pipeline.")
+# 6. Tabbed View for Clean Layout Presentation
+tab_overview, tab_customers, tab_products = st.tabs([
+    "📊 Revenue Analysis", 
+    "👥 Top Customers", 
+    "📦 Product Inventory"
+])
 
-#KPIs
-
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric(
-    "Total Revenue",
-    f"${sales['total_revenue'][0]:,.2f}"
-)
-
-col2.metric(
-    "Total Orders",
-    int(sales["total_orders"][0])
-)
-
-col3.metric(
-    "Average Order Value",
-    f"${sales['average_order_value'][0]:,.2f}"
-)
-
-col4.metric(
-    "Items Sold",
-    int(sales["total_items_sold"][0])
-)
-
-#category revenue
-
-st.divider()
-
-st.subheader("Revenue by Category")
-
-fig = px.bar(
-    category,
-    x="category",
-    y="revenue",
-    color="category",
-    text="revenue"
-)
-
-fig.update_layout(
-    showlegend=False,
-    xaxis_title="Category",
-    yaxis_title="Revenue"
-)
-
-fig.update_traces(texttemplate="$%{text:,.2f}")
-
-st.plotly_chart(fig, use_container_width=True)
-
-#TOP Customers
-
-st.divider()
-
-st.subheader("Top Customers")
-
-customers["lifetime_value"] = customers["lifetime_value"].round(2)
-customers["average_order_value"] = customers["average_order_value"].round(2)
-
-st.dataframe(
-    customers,
-    use_container_width=True,
-    hide_index=True
-)
-
-#All Prods 
-
-st.divider()
-
-st.subheader("Products")
-
-search = st.text_input("Search Product")
-
-filtered_products = products[
-    products["title"].str.contains(
-        search,
-        case=False,
-        na=False
+# --- TAB 1: OVERVIEW & CHART ---
+with tab_overview:
+    st.subheader("Revenue Distribution by Category")
+    
+    # Cleaned up Plotly Bar Chart
+    fig = px.bar(
+        category,
+        x="category",
+        y="revenue",
+        color="revenue", # Gradient coloring looks more professional than categorical coloring
+        color_continuous_scale="Blues",
+        text="revenue",
+        labels={"category": "Product Category", "revenue": "Revenue ($)"}
     )
-]
+    
+    fig.update_layout(
+        template="plotly_white", # Clean presentation theme
+        coloraxis_showscale=False,
+        xaxis_tickangle=-30,
+        margin=dict(l=20, r=20, t=20, b=40),
+        height=500
+    )
+    
+    fig.update_traces(
+        texttemplate="$%{text:,.2f}", 
+        textposition="outside"
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
-st.dataframe(
-    filtered_products[
-        [
-            "product_id",
-            "title",
-            "category",
-            "brand",
-            "price",
-            "stock"
-        ]
-    ],
-    use_container_width=True,
-    hide_index=True
-)
+# --- TAB 2: CUSTOMERS ---
+with tab_customers:
+    st.subheader("Top 10 High-Value Customers")
+    st.markdown("Identified by total lifetime value (LTV) generated via the pipeline.")
+    
+    # Using column_config to professionally format the dataframe columns
+    st.dataframe(
+        customers,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "customer_id": st.column_config.NumberColumn("ID", format="%d"),
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "email": "Email Address",
+            "total_orders": st.column_config.NumberColumn("Total Orders", format="%d"),
+            "lifetime_value": st.column_config.NumberColumn("Lifetime Value (LTV)", format="$%.2f"),
+            "average_order_value": st.column_config.NumberColumn("AOV", format="$%.2f")
+        }
+    )
+
+# --- TAB 3: PRODUCTS & SEARCH ---
+with tab_products:
+    st.subheader("Inventory & Catalog Lookup")
+    
+    # Search bar optimized into columns
+    search_col, _ = st.columns([1, 2])
+    with search_col:
+        search = st.text_input("🔍 Filter catalog by product name", placeholder="Type a product...")
+
+    filtered_products = products[
+        products["title"].str.contains(search, case=False, na=False)
+    ]
+    
+    # Selected clean view of columns with formatted prices and progress bars for stock
+    st.dataframe(
+        filtered_products[[
+            "product_id", "title", "category", "brand", "price", "stock"
+        ]],
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "product_id": st.column_config.NumberColumn("Product ID", format="%d"),
+            "title": "Product Title",
+            "category": "Category",
+            "brand": "Brand",
+            "price": st.column_config.NumberColumn("Unit Price", format="$%.2f"),
+            "stock": st.column_config.ProgressColumn("Stock Level", min_value=0, max_value=150, format="%d units")
+        }
+    )
